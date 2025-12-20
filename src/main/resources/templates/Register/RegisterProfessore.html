@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+<h1>Registrazione Professore</h1>
+<form id="register-form">
+    <div>
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" required>
+    </div>
+    <div>
+        <label for="cognome">Cognome:</label>
+        <input type="text" id="cognome" required>
+    </div>
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+    </div>
+    <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" required autocomplete="off" >
+    </div>
+
+    <div>
+        <label for="telefono">Telefono:</label>
+        <input type="number" id="telefono">
+    </div>
+
+    <button type="submit">Registrati</button>
+</form>
+<p id="message"></p>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const registerForm = document.getElementById('register-form');
+        const messageElement = document.getElementById('message'); // Aggiunto per riferimento
+
+
+        // --- FORM SUBMIT CORRETTO ---
+        registerForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const nome = document.getElementById('nome').value;
+            const cognome = document.getElementById('cognome').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const telefono = document.getElementById('telefono').value;
+            // 5. CORREZIONE: Prendiamo il valore selezionato dalla select.
+
+
+
+            try {
+                const response = await fetch('/api/auth/registerProfessore', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+
+                    body: JSON.stringify({ nome, cognome, email, password, telefono })
+                });
+
+                // 7. CORREZIONE: La logica di successo è in response.ok (NON !response.ok)
+                if (response.ok) {
+                    const data = await response.json();
+                    messageElement.textContent = 'Registrazione effettuata con successo!';
+                    messageElement.style.color = 'green';
+                    registerForm.reset(); // Pulisce il form dopo il successo
+                } else {
+                    // Gestisce errori dal server (es. email già in uso)
+                    const errorData = await response.json();
+                    messageElement.textContent = `Errore: ${errorData.message || 'Campi non validi'}`;
+                    messageElement.style.color = 'red';
+                }
+            } catch (error) {
+                console.error('Errore durante la richiesta di registrazione:', error);
+                messageElement.textContent = 'Errore di connessione. Riprova più tardi.';
+                messageElement.style.color = 'red';
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

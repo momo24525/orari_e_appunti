@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+
+<!-- Il form di login, che nasconderemo dopo l'accesso -->
+<form id="login-form">
+    <h1>Login</h1>
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+    </div>
+    <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" required>
+    </div>
+    <button type="submit">Login</button>
+</form>
+
+<!-- Il bottone di logout, nascosto di default -->
+<button type="button" id="logout-button" style="display: none;">Logout</button>
+
+<p id="message"></p>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginForm = document.getElementById('login-form');
+        const logoutButton = document.getElementById('logout-button');
+        const messageElement = document.getElementById('message');
+
+        // Funzione per aggiornare l'interfaccia allo stato "loggato"
+        function showLoggedInState(roles) {
+            loginForm.style.display = 'none'; // Nasconde il form di login
+            logoutButton.style.display = 'block'; // Mostra il bottone di logout
+            messageElement.textContent = `Login effettuato con successo! Ruolo: ${roles[0]}`;
+            messageElement.style.color = 'green';
+        }
+
+        // Funzione per ripristinare l'interfaccia allo stato "logout"
+        function showLoggedOutState() {
+            loginForm.style.display = 'block'; // Mostra di nuovo il form
+            logoutButton.style.display = 'none'; // Nasconde il bottone di logout
+            messageElement.textContent = 'Logout effettuato con successo.';
+            messageElement.style.color = 'blue';
+        }
+
+        // CONTROLLO INIZIALE: Se l'utente è già loggato, mostriamo subito lo stato corretto
+        const token = localStorage.getItem('jwt-token');
+        if (token) {
+            const roles = JSON.parse(localStorage.getItem('user-roles') || '[]');
+            showLoggedInState(roles);
+        }
+
+        // --- GESTIONE LOGIN ---
+        loginForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('jwt-token', data.token);
+                    localStorage.setItem('user-roles', JSON.stringify(data.roles));
+
+                    // Aggiorna l'interfaccia
+                    showLoggedInState(data.roles);
+                } else {
+                    messageElement.textContent = 'Email o password non validi.';
+                    messageElement.style.color = 'red';
+                }
+            } catch (error) {
+                console.error('Errore durante la richiesta di login:', error);
+                messageElement.textContent = 'Errore di connessione. Riprova più tardi.';
+                messageElement.style.color = 'red';
+            }
+        });
+
+        // --- GESTIONE LOGOUT ---
+        logoutButton.addEventListener('click', async () => {
+            const token = localStorage.getItem('jwt-token');
+            if (!token) {
+                // Se per qualche motivo non c'è il token, puliamo comunque l'interfaccia
+                showLoggedOutState();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    // Anche se il server dà errore, per l'utente il logout deve avvenire
+                    console.error('Errore dal server durante il logout, ma il client verrà resettato comunque.');
+                }
+
+            } catch (error) {
+                console.error('Errore di rete durante il logout:', error);
+            } finally {
+                // Questa parte viene eseguita SEMPRE, sia in caso di successo che di errore
+                localStorage.removeItem('jwt-token');
+                localStorage.removeItem('user-roles');
+                showLoggedOutState();
+            }
+        });
+    });
+</script>
+</body>
+</html>

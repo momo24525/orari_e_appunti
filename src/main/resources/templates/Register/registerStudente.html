@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrazione Studente</title>
+</head>
+<body>
+<h1>Registrazione Alunno</h1>
+<form id="register-form-studente">
+    <div>
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" required>
+    </div>
+    <div>
+        <label for="cognome">Cognome:</label>
+        <input type="text" id="cognome" required>
+    </div>
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+    </div>
+    <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" required autocomplete="off">
+    </div>
+    <div>
+        <label for="classe-select">Classe:</label>
+        <select name="classe" id="classe-select" required>
+            <option value="">Caricamento...</option>
+        </select>
+    </div>
+    <button type="submit">Registrati</button>
+</form>
+<p id="message"></p>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const registerForm = document.getElementById('register-form-studente');
+        const messageElement = document.getElementById('message');
+        const selectElement = document.getElementById('classe-select');
+
+        async function caricaClassi() {
+            try {
+                const response = await fetch('/api/classi');
+
+                if (!response.ok) {
+                    throw new Error('Errore nel caricamento delle classi: ' + response.statusText);
+                }
+
+                const classi = await response.json();
+
+                // Pulisce le opzioni di default (es. "Caricamento...")
+                selectElement.innerHTML = '';
+
+                // Aggiunge un'opzione di default non selezionabile
+                const defaultOption = document.createElement('option');
+                defaultOption.value = "";
+                defaultOption.textContent = "Seleziona una classe";
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                selectElement.appendChild(defaultOption);
+
+                // Aggiunge le classi ricevute dal server
+                classi.forEach(classe => {
+                    const option = document.createElement('option');
+                    option.value = classe.id;
+                    option.textContent = `${classe.anno} ${classe.sezione} - ${classe.articolazione}`;
+                    selectElement.appendChild(option);
+                });
+
+            } catch (error) {
+                console.error('Impossibile caricare le classi:', error);
+                selectElement.innerHTML = '<option value="">Errore nel caricamento</option>';
+            }
+        }
+
+        caricaClassi();
+
+        registerForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const nome = document.getElementById('nome').value;
+            const cognome = document.getElementById('cognome').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const classeId = selectElement.value;
+
+            if (!classeId) {
+                messageElement.textContent = 'Per favore, seleziona una classe.';
+                messageElement.style.color = 'red';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auth/registerStudente', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nome, cognome, email, password, classeId })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    messageElement.textContent = 'Registrazione effettuata con successo!';
+                    messageElement.style.color = 'green';
+                    registerForm.reset(); // Pulisce il form
+                } else {
+                    const errorData = await response.json().catch(() => ({ message: 'Errore generico dal server.' }));
+                    messageElement.textContent = `Errore: ${errorData.message || 'Campi non validi'}`;
+                    messageElement.style.color = 'red';
+                }
+            } catch (error) {
+                console.error('Errore durante la richiesta di registrazione:', error);
+                messageElement.textContent = 'Errore di connessione. Riprova più tardi.';
+                messageElement.style.color = 'red';
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
