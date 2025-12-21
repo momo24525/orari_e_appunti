@@ -41,6 +41,13 @@ public class StudenteService {
                 .collect(Collectors.toList());
     }
 
+    public List<StudenteDTO> findByEmail(String email) {
+        return studenteRepository.findByUserEmail(email)
+                .stream()
+                .map(StudenteMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
 
 
 }

@@ -1,55 +1,70 @@
 package com.scuola.orari_e_appunti.services;
 
-import com.scuola.orari_e_appunti.model.Classe;
-import com.scuola.orari_e_appunti.model.Lezione;
-import com.scuola.orari_e_appunti.repository.LezioneRepository;
+import com.scuola.orari_e_appunti.dto.LezioneDTO;
+import com.scuola.orari_e_appunti.mapper.LezioneMapper;
+import com.scuola.orari_e_appunti.model.*;
+import com.scuola.orari_e_appunti.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class LezioneService {
 
     @Autowired
     private LezioneRepository lezioneRepository;
+    @Autowired
+    private StudenteRepository studenteRepository;
+    @Autowired
+    private ClasseService classeService;
+    @Autowired
+    private ProfessoreRepository professoreRepository;
 
 
-    public List<Lezione> getOrarioByClasse(Classe classe) {
-        return lezioneRepository.findByClasseOrderByGiornoAscOraAsc(classe);
+
+
+    public List<LezioneDTO> getAllLezioni() {
+        return lezioneRepository.findAll()
+                .stream()
+                .map(LezioneMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public Lezione eliminaLezione(Long id) {
-        Lezione l = lezioneRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Lezione non trovata"));
+    public List<LezioneDTO> getOrarioPerStudente (String email) {
 
-        lezioneRepository.delete(l);
-        return l;
+        Studente studente = studenteRepository.findByUserEmail(email)
+                .orElseThrow(() -> new RuntimeException("Studente non trovato"));
+
+        Classe classeStudente = studente.getClasse();
+
+        if (classeStudente == null) {
+            throw new RuntimeException("Studente non assegnato a una classe");
+        }
+
+        return  lezioneRepository.findByClasseOrderByGiornoAscOraAsc(classeStudente)
+                .stream()
+                .map(LezioneMapper::toDTO)
+                .collect(Collectors.toList());
+
     }
 
-    public Lezione findById(Long id) {
-        return lezioneRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Lezione con id " + id + " non trovata"));
+    // In LezioneService.java
+    public List<LezioneDTO> getOrarioPerProf(String email) {
+
+        // 1. Trova il professore tramite l'email
+        Professore professore = professoreRepository.findByUserEmail(email)
+                .orElseThrow(() -> new RuntimeException("Professore non trovato"));
+
+        // 2. Usa il nuovo metodo del repository per trovare direttamente le sue lezioni
+        return lezioneRepository.findByProfessoreOrderByGiornoAscOraAsc(professore)
+                .stream()
+                .map(LezioneMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
-    public Lezione aggiornaLezione(Long id, Lezione lezioneAggiornata) {
-        Lezione l = lezioneRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Lezione non trovata"));
-
-        // Aggiorni solo i campi modificabili
-        lezioneAggiornata.setClasse(l.getClasse()); // forza la classe originale
-        l.setGiorno(lezioneAggiornata.getGiorno());
-        l.setOra(lezioneAggiornata.getOra());
-        l.setMateria(lezioneAggiornata.getMateria());
-        l.setProfessore(lezioneAggiornata.getProfessore());
-
-        return lezioneRepository.save(l);
-    }
-
-    public Lezione salva(Lezione lezione) {
-        return lezioneRepository.save(lezione);
-    }
 
 
 }

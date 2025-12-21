@@ -30,7 +30,10 @@ public class SecurityConfig {
                 // --- NUOVA CONFIGURAZIONE DELLE RICHIESTE ---
                 .authorizeHttpRequests(auth -> auth
                         // 1. Endpoint pubblici: login, registrazione, documentazione API, ecc.
+                        .requestMatchers("/login/**").permitAll()
+                        .requestMatchers("/registerstudente/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/lezioni/**").authenticated()
                         // 2. Risorse statiche pubbliche (JS, CSS, Immagini, ecc.)
                         .requestMatchers("/", "/js/**", "/css/**", "/images/**").permitAll() // <-- AGGIUNGI QUESTA RIGA
 

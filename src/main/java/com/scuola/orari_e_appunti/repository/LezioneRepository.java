@@ -1,9 +1,8 @@
 package com.scuola.orari_e_appunti.repository;
 
-import com.scuola.orari_e_appunti.model.Classe;
-import com.scuola.orari_e_appunti.model.Giorno_Enum;
-import com.scuola.orari_e_appunti.model.Lezione;
-import com.scuola.orari_e_appunti.model.Ora_Enum;
+import com.scuola.orari_e_appunti.dto.ClasseDTO;
+import com.scuola.orari_e_appunti.dto.LezioneDTO;
+import com.scuola.orari_e_appunti.model.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -22,4 +21,6 @@ public interface LezioneRepository extends JpaRepository<Lezione, Long> {
     List<Lezione> findByClasse(Classe classe);
 
     boolean existsByClasseIdAndGiornoAndOra(Long classeId, Giorno_Enum giorno, Ora_Enum ora);
+
+    List<Lezione> findByProfessoreOrderByGiornoAscOraAsc(Professore professore);
 }
