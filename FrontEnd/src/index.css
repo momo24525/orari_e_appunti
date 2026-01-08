@@ -1,0 +1,13 @@
+.lezioni-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  padding: 12px;
+}
+
+.lezione-card {
+  padding: 12px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
