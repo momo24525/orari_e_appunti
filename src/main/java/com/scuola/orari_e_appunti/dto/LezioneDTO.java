@@ -3,6 +3,8 @@ import com.scuola.orari_e_appunti.model.Classe;
 
 public class LezioneDTO {
 
+
+    private long id;
     private String ora;
     private String giorno;
     private String materia;
@@ -11,7 +13,8 @@ public class LezioneDTO {
 
     public LezioneDTO () {}
 
-    public LezioneDTO(String ora, String giorno, String materia, String nomeProfessore, String nomeClasse) {
+    public LezioneDTO(long id,String ora, String giorno, String materia, String nomeProfessore, String nomeClasse) {
+        this.id = id;
         this.ora = ora;
         this.giorno = giorno;
         this.materia = materia;
@@ -19,6 +22,13 @@ public class LezioneDTO {
         this.nomeClasse = nomeClasse;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
     public String getOra() {
         return ora;
     }

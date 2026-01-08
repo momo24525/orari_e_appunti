@@ -1,17 +1,18 @@
-package com.scuola.orari_e_appunti.dto;
+package com.scuola.orari_e_appunti.dto.Auth.Registrazione;
 
-import com.scuola.orari_e_appunti.model.Classe;
-
-import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public class ProfessoreRegistrationRequestDTO {
 
     private String nome;
     private String cognome;
     private String email;
+
+    @NotBlank(message = "La password è obbligatoria")
+    @Size(min = 8, message = "La lunghezza minima è di 8 caratteri")
     private String password;
     private String telefono;
-    private String classi;
 
     // Getters e Setters sono necessari per la deserializzazione JSON
 
@@ -36,7 +37,7 @@ public class ProfessoreRegistrationRequestDTO {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email.toLowerCase();
     }
 
     public String getPassword() {
@@ -55,12 +56,4 @@ public class ProfessoreRegistrationRequestDTO {
         this.telefono = telefono;
     }
 
-
-    public String getClassi() {
-        return classi;
-    }
-
-    public void setClassi(String classi) {
-        this.classi = classi;
-    }
 }

@@ -14,7 +14,6 @@ public class StudenteMapper {
                 studente.getId(),
                 studente.getNome(),
                 studente.getCognome(),
-                studente.getClasse() != null ? studente.getClasse().getId() : null,
                 studente.getUser() != null ? studente.getUser().getEmail() : null
         );
     }

@@ -1,8 +1,8 @@
 package com.scuola.orari_e_appunti.services.Auth;
 
 import com.scuola.orari_e_appunti.dto.ProfessoreDTO;
-import com.scuola.orari_e_appunti.dto.ProfessoreRegistrationRequestDTO;
-import com.scuola.orari_e_appunti.dto.RegistrationRequestDTO;
+import com.scuola.orari_e_appunti.dto.Auth.Registrazione.ProfessoreRegistrationRequestDTO;
+import com.scuola.orari_e_appunti.dto.Auth.Registrazione.RegistrationRequestDTO;
 import com.scuola.orari_e_appunti.dto.StudenteDTO;
 import com.scuola.orari_e_appunti.mapper.ProfessoreMapper;
 import com.scuola.orari_e_appunti.mapper.StudenteMapper;
@@ -12,9 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
-import java.util.List;
 
 @Service
 public class AuthService {
@@ -71,10 +68,6 @@ public class AuthService {
             throw new RuntimeException("Email già in uso!");
         }
 
-        Classe classe = classeRepository.findById(request.getClasseId()) // "c" minuscola
-                .orElseThrow(() -> new RuntimeException("Classe non trovata con ID: " + request.getClasseId()));
-
-
 
         Role assignedRole = roleRepository.findByNome("ROLE_STUDENTE")
                 .orElseThrow(() -> new RuntimeException("errore: ruolo studente non trovato"));
@@ -88,13 +81,8 @@ public class AuthService {
         Studente studente = new Studente();
         studente.setNome(request.getNome());
         studente.setCognome(request.getCognome());
-        studente.setClasse(classe);
 
         studente.setUser(user);
-
-
-
-
         Studente savedStudente = studenteRepository.save(studente);
 
         // 7. Converte l'entità salvata in DTO e la restituisce

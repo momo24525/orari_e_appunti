@@ -4,12 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -25,22 +31,27 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
 
                 // --- NUOVA CONFIGURAZIONE DELLE RICHIESTE ---
                 .authorizeHttpRequests(auth -> auth
-                        // 1. Endpoint pubblici: login, registrazione, documentazione API, ecc.
+
+                        //pagine
                         .requestMatchers("/login/**").permitAll()
                         .requestMatchers("/registerstudente/**").permitAll()
+                        .requestMatchers("/registerprofessore/**").permitAll()
+
+                        //endpoint
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/lezioni/**").authenticated()
+
+
                         // 2. Risorse statiche pubbliche (JS, CSS, Immagini, ecc.)
                         .requestMatchers("/", "/js/**", "/css/**", "/images/**").permitAll() // <-- AGGIUNGI QUESTA RIGA
 
-                        // Lasciamo questo pubblico per ora
                         .requestMatchers("/h2-console/**").permitAll()
                         // 2. Tutte le altre richieste devono essere autenticate
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
 
                 // --- GESTIONE DELLA SESSIONE ---
@@ -62,5 +73,18 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173")); // La porta del tuo frontend React
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true); // Importante se mandi cookie o header di auth
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Applica a tutti gli endpoint
+        return source;
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173") // Assicurati che la porta sia quella del tuo frontend
 @RestController
 @RequestMapping("/api/lezioni") // Tutte le richieste a questo controller inizieranno con /api/studenti
 public class LezioniController {

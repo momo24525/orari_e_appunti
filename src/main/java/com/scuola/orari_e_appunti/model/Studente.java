@@ -19,9 +19,10 @@ public class Studente {
     @Column(nullable = false)
     private String cognome;
 
-    @ManyToOne
-    @JoinColumn(name = "classe_id", nullable = false)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "classe_id", nullable = true)
     private Classe classe;
+
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")

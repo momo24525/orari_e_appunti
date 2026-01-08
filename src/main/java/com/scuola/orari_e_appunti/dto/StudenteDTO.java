@@ -5,18 +5,16 @@ public class StudenteDTO {
     private Long id;
     private String nome;
     private String cognome;
-    private Long classeId;
     private String email;
 
 
     public StudenteDTO() {
     }
 
-    public StudenteDTO(Long id, String nome, String cognome, Long classeId, String email) {
+    public StudenteDTO(Long id, String nome, String cognome, String email) {
         this.id = id;
         this.nome = nome;
         this.cognome = cognome;
-        this.classeId = classeId;
         this.email = email;
     }
 
@@ -44,13 +42,6 @@ public class StudenteDTO {
         this.cognome = cognome;
     }
 
-    public Long getClasseId() {
-        return classeId;
-    }
-
-    public void setClasseId(Long classeId) {
-        this.classeId = classeId;
-    }
 
     public String getEmail() {
         return email;

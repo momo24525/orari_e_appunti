@@ -1,12 +1,16 @@
-package com.scuola.orari_e_appunti.dto;
+package com.scuola.orari_e_appunti.dto.Auth.Registrazione;
+
+import jakarta.validation.constraints.*;
 
 public class RegistrationRequestDTO {
 
     private String nome;
     private String cognome;
     private String email;
+
+    @NotBlank(message = "La password è obbligatoria")
+    @Size(min = 8, message = "La lunghezza minima è di 8 caratteri")
     private String password;
-    private Long classeId;
 
 
 
@@ -33,7 +37,7 @@ public class RegistrationRequestDTO {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email.toLowerCase();
     }
 
     public String getPassword() {
@@ -44,13 +48,7 @@ public class RegistrationRequestDTO {
         this.password = password;
     }
 
-    public Long getClasseId() {
-        return classeId;
-    }
 
-    public void setClasseId(Long classeId) {
-        this.classeId = classeId;
-    }
 
 
 }

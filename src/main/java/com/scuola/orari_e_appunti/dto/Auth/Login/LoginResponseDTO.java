@@ -1,4 +1,4 @@
-package com.scuola.orari_e_appunti.dto.Auth;
+package com.scuola.orari_e_appunti.dto.Auth.Login;
 
 import java.util.List;
 

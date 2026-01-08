@@ -10,16 +10,12 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors; // Importante per toList() o collect()
 
 @Service
 public class JwtService {
 
-    // 1. La nostra chiave segreta. DOVREBBE essere in un file di properties,
-    // ma per ora la teniamo qui per semplicità.
-    // Deve essere una stringa lunga e complessa.
     private static final String SECRET_KEY = "d32cdc6db2d96006d5ea7e700e4cd69be0223a36c1bfd502e78a546269a5d495dcb358ba52834e0974546c7f";
-
-    // --- Metodi pubblici principali ---
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -30,10 +26,21 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
+    // --- METODO MODIFICATO CORRETTAMENTE ---
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        // 1. Crea la mappa per i claims extra
+        Map<String, Object> extraClaims = new HashMap<>();
+
+        // 2. Aggiungi i ruoli alla mappa
+        extraClaims.put("roles", userDetails.getAuthorities().stream()
+                .map(a -> a.getAuthority())
+                .collect(Collectors.toList())); // Usa collect(Collectors.toList()) per compatibilità
+
+        // 3. Chiama il metodo principale passando la mappa
+        return generateToken(extraClaims, userDetails);
     }
 
+    // --- METODO PRINCIPALE (RITORNA COME PRIMA) ---
     public String generateToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails
@@ -43,7 +50,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24)) // Token valido per 24 ore
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 20))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -52,8 +59,6 @@ public class JwtService {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
-
-    // --- Metodi privati di supporto ---
 
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
@@ -76,7 +81,4 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
-
-
-
 }

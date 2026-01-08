@@ -11,6 +11,7 @@ public class LezioneMapper {
         }
 
         return new LezioneDTO(
+                lezione.getId(),
                 lezione.getOra().name(),
                 lezione.getGiorno().name(),
                 lezione.getMateria().name(),

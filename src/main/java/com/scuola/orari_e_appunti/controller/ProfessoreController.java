@@ -1,11 +1,9 @@
 package com.scuola.orari_e_appunti.controller; // Package corretto
 
 import com.scuola.orari_e_appunti.dto.ProfessoreDTO;
-import com.scuola.orari_e_appunti.dto.ProfessoreRegistrationRequestDTO;
 import com.scuola.orari_e_appunti.services.Auth.AuthService;
 import com.scuola.orari_e_appunti.services.ProfessoreService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

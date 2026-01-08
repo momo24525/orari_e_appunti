@@ -2,9 +2,7 @@ package com.scuola.orari_e_appunti.controller; // Package corretto
 
 
 import com.scuola.orari_e_appunti.model.Classe;
-import com.scuola.orari_e_appunti.services.Auth.AuthService;
 import com.scuola.orari_e_appunti.services.ClasseService;
-import com.scuola.orari_e_appunti.services.ProfessoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

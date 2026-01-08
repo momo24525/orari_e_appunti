@@ -1,10 +1,10 @@
 package com.scuola.orari_e_appunti.controller;
 
-import com.scuola.orari_e_appunti.dto.Auth.LoginRequestDTO;
-import com.scuola.orari_e_appunti.dto.Auth.LoginResponseDTO;
+import com.scuola.orari_e_appunti.dto.Auth.Login.LoginRequestDTO;
+import com.scuola.orari_e_appunti.dto.Auth.Login.LoginResponseDTO;
 import com.scuola.orari_e_appunti.dto.ProfessoreDTO;
-import com.scuola.orari_e_appunti.dto.ProfessoreRegistrationRequestDTO;
-import com.scuola.orari_e_appunti.dto.RegistrationRequestDTO;
+import com.scuola.orari_e_appunti.dto.Auth.Registrazione.ProfessoreRegistrationRequestDTO;
+import com.scuola.orari_e_appunti.dto.Auth.Registrazione.RegistrationRequestDTO;
 import com.scuola.orari_e_appunti.dto.StudenteDTO;
 import com.scuola.orari_e_appunti.services.Auth.AuthService;
 import com.scuola.orari_e_appunti.services.jwt.DeleteToken;
@@ -85,11 +85,6 @@ public class AuthController {
         return  new ResponseEntity<>(nuovoS, HttpStatus.CREATED);
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7); // Rimuove "Bearer "
-        deleteToken.blacklistToken(token);
-        return ResponseEntity.ok("Logout effettuato");
-    }
+
 
 }

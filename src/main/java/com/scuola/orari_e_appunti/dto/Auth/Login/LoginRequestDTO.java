@@ -1,4 +1,4 @@
-package com.scuola.orari_e_appunti.dto.Auth;
+package com.scuola.orari_e_appunti.dto.Auth.Login;
 
 public class LoginRequestDTO {
 
@@ -20,7 +20,7 @@ public class LoginRequestDTO {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email.toLowerCase();
     }
 
     public String getPassword() {
